@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Trophy, Code } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface HeaderProps {
   onCreateSession: (type: 'contest' | 'problem') => void;
@@ -34,6 +35,7 @@ export function Header({ onCreateSession }: HeaderProps) {
               <Code className="h-5 w-5" />
               Problem
             </Button>
+            <ThemeToggle />
           </div>
         </div>
       </div>

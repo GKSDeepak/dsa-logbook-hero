@@ -11,6 +11,7 @@ interface SessionCardProps {
   onAddProblem: (sessionId: string, problem: Problem) => void;
   onDeleteProblem: (sessionId: string, problemId: string) => void;
   onDeleteSession: (sessionId: string) => void;
+  onUpdateSession?: (sessionId: string, updates: Partial<Session>) => void;
 }
 
 export function SessionCard({ 
@@ -18,7 +19,8 @@ export function SessionCard({
   onUpdateProblem, 
   onAddProblem, 
   onDeleteProblem, 
-  onDeleteSession 
+  onDeleteSession,
+  onUpdateSession
 }: SessionCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -37,8 +39,11 @@ export function SessionCard({
     const newProblem: Problem = {
       id: uuidv4(),
       name: '',
-      link: '',
+      link: session.type === 'problem' ? '' : undefined,
       solved: false,
+      upsolved: session.type === 'contest' ? false : undefined,
+      tag: '',
+      review: '' as const,
       notes: ''
     };
     onAddProblem(session.id, newProblem);
@@ -113,8 +118,23 @@ export function SessionCard({
 
       {isExpanded && (
         <div className="p-4 border-t border-card-border">
+          {session.type === 'contest' && (
+            <div className="mb-4">
+              <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                Contest Link
+              </label>
+              <input
+                type="text"
+                placeholder="Enter contest link..."
+                value={session.contestLink || ''}
+                onChange={(e) => onUpdateSession?.(session.id, { contestLink: e.target.value })}
+                className="w-full px-3 py-2 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          )}
           <ProblemTable
             problems={session.problems}
+            sessionType={session.type}
             onUpdateProblem={(problemId, updates) => onUpdateProblem(session.id, problemId, updates)}
             onAddProblem={handleAddProblem}
             onDeleteProblem={(problemId) => onDeleteProblem(session.id, problemId)}

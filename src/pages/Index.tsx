@@ -10,6 +10,7 @@ const Index = () => {
     sessions,
     isLoading,
     addSession,
+    updateSession,
     updateProblem,
     addProblem,
     deleteProblem,
@@ -21,8 +22,11 @@ const Index = () => {
     const defaultProblems: Problem[] = Array.from({ length: defaultProblemsCount }, () => ({
       id: uuidv4(),
       name: '',
-      link: '',
+      link: type === 'problem' ? '' : undefined,
       solved: false,
+      upsolved: type === 'contest' ? false : undefined,
+      tag: '',
+      review: '' as const,
       notes: ''
     }));
 
@@ -30,6 +34,7 @@ const Index = () => {
       id: uuidv4(),
       type,
       timestamp: new Date(),
+      contestLink: type === 'contest' ? '' : undefined,
       problems: defaultProblems
     };
 
@@ -84,6 +89,7 @@ const Index = () => {
                 onAddProblem={addProblem}
                 onDeleteProblem={deleteProblem}
                 onDeleteSession={deleteSession}
+                onUpdateSession={updateSession}
               />
             ))}
           </div>

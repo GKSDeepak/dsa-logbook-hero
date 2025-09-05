@@ -50,7 +50,9 @@ export default {
 				problem: {
 					DEFAULT: 'hsl(var(--problem))',
 					foreground: 'hsl(var(--problem-foreground))',
-					light: 'hsl(var(--problem-light))'
+					light: 'hsl(var(--problem-light))',
+					highlight: 'hsl(var(--problem-highlight))',
+					'highlight-border': 'hsl(var(--problem-highlight-border))'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -83,6 +85,10 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			gridTemplateColumns: {
+				'14': 'repeat(14, minmax(0, 1fr))',
+				'16': 'repeat(16, minmax(0, 1fr))'
 			},
 			keyframes: {
 				'accordion-down': {

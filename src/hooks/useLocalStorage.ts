@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Session, SessionStorage } from '@/types';
+import { Session, SessionStorage, Problem } from '@/types';
 
 const STORAGE_KEY = 'dsa-practice-tracker';
 
@@ -101,11 +101,3 @@ export function useLocalStorage() {
     deleteProblem
   };
 }
-
-export type Problem = {
-  id: string;
-  name: string;
-  link?: string;
-  solved: boolean;
-  notes: string;
-};
