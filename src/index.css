@@ -2,41 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* DSA Practice Tracker Design System - Clean, coding-focused theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Base colors - Clean coding interface */
+    --background: 218 23% 97%;
+    --foreground: 218 27% 12%;
 
+    /* Card and surface colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 218 27% 12%;
+    --card-border: 218 20% 90%;
 
+    /* Interface colors */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 218 27% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Professional blue for coding */
+    --primary: 218 89% 51%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 218 89% 45%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Subtle grey */
+    --secondary: 218 15% 95%;
+    --secondary-foreground: 218 27% 25%;
+    --secondary-hover: 218 15% 90%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Success - For solved problems */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 50% 95%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Contest theme */
+    --contest: 280 89% 58%;
+    --contest-foreground: 0 0% 100%;
+    --contest-light: 280 50% 97%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Problem theme */
+    --problem: 37 89% 58%;
+    --problem-foreground: 0 0% 100%;
+    --problem-light: 37 50% 97%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Muted colors */
+    --muted: 218 15% 95%;
+    --muted-foreground: 218 15% 45%;
 
-    --radius: 0.5rem;
+    /* Accent */
+    --accent: 218 89% 51%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 218 20% 88%;
+    --input: 218 20% 94%;
+    --input-border: 218 20% 82%;
+    --ring: 218 89% 51%;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(218 27% 12% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(218 27% 12% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(218 27% 12% / 0.1);
+
+    /* Radius */
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,41 +88,66 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Base colors - Dark coding interface */
+    --background: 218 27% 8%;
+    --foreground: 218 15% 90%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    /* Card and surface colors */
+    --card: 218 25% 12%;
+    --card-foreground: 218 15% 90%;
+    --card-border: 218 20% 20%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    /* Interface colors */
+    --popover: 218 25% 12%;
+    --popover-foreground: 218 15% 90%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Primary - Professional blue for coding */
+    --primary: 218 89% 60%;
+    --primary-foreground: 218 27% 8%;
+    --primary-hover: 218 89% 55%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary - Subtle grey */
+    --secondary: 218 15% 18%;
+    --secondary-foreground: 218 15% 75%;
+    --secondary-hover: 218 15% 22%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Success - For solved problems */
+    --success: 142 71% 55%;
+    --success-foreground: 218 27% 8%;
+    --success-light: 142 50% 15%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Contest theme */
+    --contest: 280 89% 65%;
+    --contest-foreground: 218 27% 8%;
+    --contest-light: 280 50% 15%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    /* Problem theme */
+    --problem: 37 89% 65%;
+    --problem-foreground: 218 27% 8%;
+    --problem-light: 37 50% 15%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Muted colors */
+    --muted: 218 15% 18%;
+    --muted-foreground: 218 15% 55%;
+
+    /* Accent */
+    --accent: 218 89% 60%;
+    --accent-foreground: 218 27% 8%;
+
+    /* Destructive */
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 218 27% 8%;
+
+    /* Borders and inputs */
+    --border: 218 20% 20%;
+    --input: 218 20% 15%;
+    --input-border: 218 20% 25%;
+    --ring: 218 89% 60%;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.4);
   }
 }
 
@@ -100,6 +157,51 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}
+
+@layer components {
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  /* Custom animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
