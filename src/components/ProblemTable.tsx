@@ -433,7 +433,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, X } from "lucide-react";
 import { Problem } from "@/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ProblemTableProps {
   problems: Problem[];
@@ -565,94 +565,106 @@ export function ProblemTable({ problems, sessionType, onUpdateProblem, onAddProb
       </div>
       
       {/* Problem Rows */}
-      {problems.map((problem) => (
-        <div
-          key={problem.id}
-          className={`grid ${gridLayout} gap-4 items-start p-3 rounded-lg border transition-all duration-200 ${
-            isProblemHighlighted(problem)
-              ? 'bg-problem-highlight border-problem-highlight-border' 
-              : isProblemSuccessful(problem)
-                ? 'bg-success-light border-success/20' 
-                : 'bg-card border-card-border hover:border-border'
-          }`}
-        >
-          {/* Problem Name */}
-          <div>
-            <Input
-              placeholder="Problem name..."
-              value={problem.name}
-              onChange={(e) => onUpdateProblem(problem.id, { name: e.target.value })}
-              className={getHighlightClasses(isProblemHighlighted(problem))}
-            />
-          </div>
+      {problems.map((problem) => {
+        const [name, setName] = useState(problem.name);
+        const [notes, setNotes] = useState(problem.notes);
 
-          {/* Solved checkbox */}
-          <div className="flex items-center justify-center pt-2">
-            <Checkbox
-              checked={problem.solved}
-              onCheckedChange={(checked) => 
-                onUpdateProblem(problem.id, { solved: checked as boolean })
-              }
-            />
-          </div>
+        useEffect(() => {
+          setName(problem.name);
+          setNotes(problem.notes);
+        }, [problem.name, problem.notes]);
 
-          {/* Upsolved checkbox (contest only) */}
-          {sessionType === 'contest' && (
+        return (
+          <div
+            key={problem.id}
+            className={`grid ${gridLayout} gap-4 items-start p-3 rounded-lg border transition-all duration-200 ${
+              isProblemHighlighted(problem)
+                ? 'bg-problem-highlight border-problem-highlight-border' 
+                : isProblemSuccessful(problem)
+                  ? 'bg-success-light border-success/20' 
+                  : 'bg-card border-card-border hover:border-border'
+            }`}
+          >
+            {/* Problem Name */}
+            <div>
+              <Input
+                placeholder="Problem name..."
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={() => onUpdateProblem(problem.id, { name })}
+                className={getHighlightClasses(isProblemHighlighted(problem))}
+              />
+            </div>
+
+            {/* Solved checkbox */}
             <div className="flex items-center justify-center pt-2">
               <Checkbox
-                checked={problem.upsolved || false}
+                checked={problem.solved}
                 onCheckedChange={(checked) => 
-                  onUpdateProblem(problem.id, { upsolved: checked as boolean })
+                  onUpdateProblem(problem.id, { solved: checked as boolean })
                 }
               />
             </div>
-          )}
-          
-          {/* Tag cell */}
-          <div>
-            {renderTagsCell(problem)}
+
+            {/* Upsolved checkbox (contest only) */}
+            {sessionType === 'contest' && (
+              <div className="flex items-center justify-center pt-2">
+                <Checkbox
+                  checked={problem.upsolved || false}
+                  onCheckedChange={(checked) => 
+                    onUpdateProblem(problem.id, { upsolved: checked as boolean })
+                  }
+                />
+              </div>
+            )}
+            
+            {/* Tag cell */}
+            <div>
+              {renderTagsCell(problem)}
+            </div>
+            
+            {/* Review dropdown */}
+            <div>
+              <Select 
+                value={problem.review || ''} 
+                onValueChange={(value) => onUpdateProblem(problem.id, { review: value as Problem['review'] })}
+              >
+                <SelectTrigger className={`text-sm ${getHighlightClasses(isProblemHighlighted(problem))}`}>
+                  <SelectValue placeholder="Review..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="very good problem">Very good problem</SelectItem>
+                  <SelectItem value="good idea">Good idea</SelectItem>
+                  <SelectItem value="easy problem">Easy problem</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Notes */}
+            <div>
+              <Textarea
+                placeholder="Notes, approach, complexity..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                onBlur={() => onUpdateProblem(problem.id, { notes })}
+                className={`min-h-[80px] resize-none ${getHighlightClasses(isProblemHighlighted(problem))}`}
+              />
+            </div>
+            
+            {/* Actions */}
+            <div className="flex items-center justify-center pt-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDeleteProblem(problem.id)}
+                className="h-6 w-6 text-muted-foreground hover:text-destructive"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
-          
-          {/* Review dropdown */}
-          <div>
-            <Select 
-              value={problem.review || ''} 
-              onValueChange={(value) => onUpdateProblem(problem.id, { review: value as Problem['review'] })}
-            >
-              <SelectTrigger className={`text-sm ${getHighlightClasses(isProblemHighlighted(problem))}`}>
-                <SelectValue placeholder="Review..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="very good problem">Very good problem</SelectItem>
-                <SelectItem value="good idea">Good idea</SelectItem>
-                <SelectItem value="easy problem">Easy problem</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Notes */}
-          <div>
-            <Textarea
-              placeholder="Notes, approach, complexity..."
-              value={problem.notes}
-              onChange={(e) => onUpdateProblem(problem.id, { notes: e.target.value })}
-              className={`min-h-[80px] resize-none ${getHighlightClasses(isProblemHighlighted(problem))}`}
-            />
-          </div>
-          
-          {/* Actions */}
-          <div className="flex items-center justify-center pt-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDeleteProblem(problem.id)}
-              className="h-6 w-6 text-muted-foreground hover:text-destructive"
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
-      ))}
+        );
+      })}
       
       <Button
         variant="outline"

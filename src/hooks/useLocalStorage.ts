@@ -1,93 +1,171 @@
 import { useState, useEffect } from 'react';
-import { Session, SessionStorage, Problem } from '@/types';
+import { Session, Problem } from '@/types';
 
-const STORAGE_KEY = 'dsa-practice-tracker';
-
-export function useLocalStorage() {
+export function useLocalStorage() { // Renamed from useLocalStorage to usePersistentStorage conceptually
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load data from localStorage on mount
-  useEffect(() => {
+  const API_BASE_URL = 'http://localhost:3001/api'; // Assuming your backend runs on port 3001
+
+  const fetchSessions = async () => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const data: SessionStorage = JSON.parse(stored);
-        // Convert timestamp strings back to Date objects
-        const sessionsWithDates = data.sessions.map(session => ({
-          ...session,
-          timestamp: new Date(session.timestamp)
-        }));
-        setSessions(sessionsWithDates);
+      const response = await fetch(`${API_BASE_URL}/sessions`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const data: Session[] = await response.json();
+      // Convert timestamp (number) back to Date objects
+      const sessionsWithDates = data.map(session => ({
+        ...session,
+        timestamp: new Date(session.timestamp),
+      }));
+      setSessions(sessionsWithDates.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()));
     } catch (error) {
-      console.error('Error loading sessions from localStorage:', error);
+      console.error('Error loading sessions from backend:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Load data from backend on mount
+  useEffect(() => {
+    fetchSessions();
   }, []);
 
-  // Save data to localStorage whenever sessions change
-  useEffect(() => {
-    if (!isLoading) {
-      try {
-        const data: SessionStorage = { sessions };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      } catch (error) {
-        console.error('Error saving sessions to localStorage:', error);
+  const addSession = async (session: Session) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...session, timestamp: session.timestamp.getTime() }), // Convert Date to number
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const addedSession = await response.json();
+      setSessions(prev => [{ ...session, timestamp: new Date(session.timestamp) }, ...prev].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()));
+    } catch (error) {
+      console.error('Error adding session:', error);
     }
-  }, [sessions, isLoading]);
-
-  const addSession = (session: Session) => {
-    setSessions(prev => [session, ...prev]);
   };
 
-  const updateSession = (sessionId: string, updatedSession: Partial<Session>) => {
-    setSessions(prev => 
-      prev.map(session => 
-        session.id === sessionId ? { ...session, ...updatedSession } : session
-      )
-    );
+  const updateSession = async (sessionId: string, updatedSession: Partial<Session>) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...updatedSession, timestamp: updatedSession.timestamp?.getTime() }), // Convert Date to number if present
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setSessions(prev =>
+        prev.map(session =>
+          session.id === sessionId ? { ...session, ...updatedSession, timestamp: updatedSession.timestamp ? new Date(updatedSession.timestamp) : session.timestamp } : session
+        ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      );
+    } catch (error) {
+      console.error('Error updating session:', error);
+    }
   };
 
-  const deleteSession = (sessionId: string) => {
-    setSessions(prev => prev.filter(session => session.id !== sessionId));
+  const deleteSession = async (sessionId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setSessions(prev => prev.filter(session => session.id !== sessionId).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()));
+    } catch (error) {
+      console.error('Error deleting session:', error);
+    }
   };
 
-  const updateProblem = (sessionId: string, problemId: string, updatedProblem: Partial<Problem>) => {
-    setSessions(prev =>
-      prev.map(session =>
-        session.id === sessionId
-          ? {
-              ...session,
-              problems: session.problems.map(problem =>
-                problem.id === problemId ? { ...problem, ...updatedProblem } : problem
-              )
-            }
-          : session
-      )
-    );
+  const updateProblem = async (sessionId: string, problemId: string, updatedProblem: Partial<Problem>) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/problems/${problemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProblem),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setSessions(prev =>
+        prev.map(session =>
+          session.id === sessionId
+            ? {
+                ...session,
+                problems: session.problems.map(problem =>
+                  problem.id === problemId ? { ...problem, ...updatedProblem } : problem
+                ),
+              }
+            : session
+        ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      );
+    } catch (error) {
+      console.error('Error updating problem:', error);
+    }
   };
 
-  const addProblem = (sessionId: string, problem: Problem) => {
-    setSessions(prev =>
-      prev.map(session =>
-        session.id === sessionId
-          ? { ...session, problems: [...session.problems, problem] }
-          : session
-      )
-    );
+  const addProblem = async (sessionId: string, problem: Problem) => {
+    const originalSessions = sessions; // Capture current state for potential rollback
+    try {
+      // Optimistically update the UI
+      setSessions(prev =>
+        prev.map(session =>
+          session.id === sessionId
+            ? { ...session, problems: [...session.problems, problem] }
+            : session
+        ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      );
+
+      const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/problems`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(problem),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error adding problem:', error);
+      setSessions(originalSessions); // Rollback on error
+    }
   };
 
-  const deleteProblem = (sessionId: string, problemId: string) => {
-    setSessions(prev =>
-      prev.map(session =>
-        session.id === sessionId
-          ? { ...session, problems: session.problems.filter(p => p.id !== problemId) }
-          : session
-      )
-    );
+  const deleteProblem = async (sessionId: string, problemId: string) => {
+    const originalSessions = sessions; // Capture current state for potential rollback
+    try {
+      // Optimistically update the UI
+      setSessions(prev =>
+        prev.map(session =>
+          session.id === sessionId
+            ? { ...session, problems: session.problems.filter(p => p.id !== problemId) }
+            : session
+        ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      );
+
+      const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/problems/${problemId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error deleting problem:', error);
+      setSessions(originalSessions); // Rollback on error
+    }
   };
 
   return {
@@ -98,6 +176,6 @@ export function useLocalStorage() {
     deleteSession,
     updateProblem,
     addProblem,
-    deleteProblem
+    deleteProblem,
   };
 }

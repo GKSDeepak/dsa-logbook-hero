@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ProblemTable } from "./ProblemTable";
 import { Trophy, Code, ChevronDown, ChevronUp, Trash2, Calendar } from "lucide-react";
@@ -14,15 +14,20 @@ interface SessionCardProps {
   onUpdateSession?: (sessionId: string, updates: Partial<Session>) => void;
 }
 
-export function SessionCard({ 
-  session, 
-  onUpdateProblem, 
-  onAddProblem, 
-  onDeleteProblem, 
+export function SessionCard({
+  session,
+  onUpdateProblem,
+  onAddProblem,
+  onDeleteProblem,
   onDeleteSession,
   onUpdateSession
 }: SessionCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [contestLink, setContestLink] = useState(session.contestLink || '');
+
+  useEffect(() => {
+    setContestLink(session.contestLink || '');
+  }, [session.contestLink]);
 
   const formatTimestamp = (timestamp: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -39,9 +44,9 @@ export function SessionCard({
     const newProblem: Problem = {
       id: uuidv4(),
       name: '',
-      link: session.type === 'problem' ? '' : undefined,
+      link: session.type === 'problem' ? '' : '', // Ensure link is always a string
       solved: false,
-      upsolved: session.type === 'contest' ? false : undefined,
+      upsolved: session.type === 'contest' ? false : false, // Ensure upsolved is always a boolean
       tag: '',
       review: '' as const,
       notes: ''
@@ -59,8 +64,8 @@ export function SessionCard({
     <div className="animate-slide-up bg-card border border-card-border rounded-lg shadow-md overflow-hidden">
       <div
         className={`p-4 cursor-pointer transition-colors duration-200 ${
-          session.type === 'contest' 
-            ? 'bg-contest-light hover:bg-contest-light/70' 
+          session.type === 'contest'
+            ? 'bg-contest-light hover:bg-contest-light/70'
             : 'bg-problem-light hover:bg-problem-light/70'
         }`}
         onClick={() => setIsExpanded(!isExpanded)}
@@ -92,7 +97,7 @@ export function SessionCard({
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -126,8 +131,9 @@ export function SessionCard({
               <input
                 type="text"
                 placeholder="Enter contest link..."
-                value={session.contestLink || ''}
-                onChange={(e) => onUpdateSession?.(session.id, { contestLink: e.target.value })}
+                value={contestLink}
+                onChange={(e) => setContestLink(e.target.value)}
+                onBlur={() => onUpdateSession?.(session.id, { contestLink })}
                 className="w-full px-3 py-2 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
