@@ -117,16 +117,18 @@ export function useLocalStorage() { // Renamed from useLocalStorage to usePersis
   };
 
   const addProblem = async (sessionId: string, problem: Problem) => {
+    console.log('Attempting to add problem:', problem, 'to session:', sessionId);
     const originalSessions = sessions; // Capture current state for potential rollback
     try {
       // Optimistically update the UI
-      setSessions(prev =>
+      const newSessions = prev =>
         prev.map(session =>
           session.id === sessionId
             ? { ...session, problems: [...session.problems, problem] }
             : session
-        ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-      );
+        ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      setSessions(newSessions);
+      console.log('Optimistically updated sessions (add problem):', newSessions(originalSessions));
 
       const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/problems`, {
         method: 'POST',
@@ -138,23 +140,27 @@ export function useLocalStorage() { // Renamed from useLocalStorage to usePersis
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      console.log('Problem added successfully to backend.');
     } catch (error) {
       console.error('Error adding problem:', error);
       setSessions(originalSessions); // Rollback on error
+      console.log('Rolled back sessions (add problem).');
     }
   };
 
   const deleteProblem = async (sessionId: string, problemId: string) => {
+    console.log('Attempting to delete problem:', problemId, 'from session:', sessionId);
     const originalSessions = sessions; // Capture current state for potential rollback
     try {
       // Optimistically update the UI
-      setSessions(prev =>
+      const newSessions = prev =>
         prev.map(session =>
           session.id === sessionId
             ? { ...session, problems: session.problems.filter(p => p.id !== problemId) }
             : session
-        ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-      );
+        ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      setSessions(newSessions);
+      console.log('Optimistically updated sessions (delete problem):', newSessions(originalSessions));
 
       const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/problems/${problemId}`, {
         method: 'DELETE',
@@ -162,9 +168,11 @@ export function useLocalStorage() { // Renamed from useLocalStorage to usePersis
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      console.log('Problem deleted successfully from backend.');
     } catch (error) {
       console.error('Error deleting problem:', error);
       setSessions(originalSessions); // Rollback on error
+      console.log('Rolled back sessions (delete problem).');
     }
   };
 
