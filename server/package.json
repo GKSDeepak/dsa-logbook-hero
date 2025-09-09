@@ -4,14 +4,15 @@
   "description": "Backend for DSA Logbook Hero",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node -r dotenv/config index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
     "express": "^4.19.2",
-    "sqlite3": "^5.1.7"
+    "mongodb": "^6.19.0"
   }
 }

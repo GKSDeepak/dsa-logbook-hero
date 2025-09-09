@@ -427,9 +427,10 @@
 
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Table, List } from "lucide-react";
 import { Problem } from "@/types";
 import { ProblemRow } from "./ProblemRow"; // Import the new component
+import { useState } from "react";
 
 interface ProblemTableProps {
   problems: Problem[];
@@ -440,6 +441,8 @@ interface ProblemTableProps {
 }
 
 export function ProblemTable({ problems, sessionType, onUpdateProblem, onAddProblem, onDeleteProblem }: ProblemTableProps) {
+  const [viewMode, setViewMode] = useState<'table' | 'list'>('table');
+  
   const isProblemHighlighted = (problem: Problem) => {
     if (sessionType === 'contest') {
       return !problem.solved && !problem.upsolved;
@@ -463,45 +466,72 @@ export function ProblemTable({ problems, sessionType, onUpdateProblem, onAddProb
     : "grid-cols-[3fr_0.5fr_1.5fr_2fr_4.5fr_auto]";
 
   return (
-    <div className="space-y-3">
-      {/* Header */}
-      <div className={`grid ${gridLayout} gap-4 items-center text-sm font-medium text-muted-foreground px-3`}>
-        {sessionType === 'contest' ? (
-          <>
-            <div>Problem Name</div>
-            <div className="text-center">Solved</div>
-            <div className="text-center">Upsolved</div>
-            <div>Tag</div>
-            <div>Review</div>
-            <div>Notes</div>
-            <div></div>
-          </>
-        ) : (
-          <>
-            <div>Problem Name</div>
-            <div className="text-center">Solved</div>
-            <div>Tag</div>
-            <div>Review</div>
-            <div>Notes</div>
-            <div></div>
-          </>
-        )}
+    <div className="space-y-4">
+      {/* View mode toggle for mobile */}
+      <div className="flex justify-between items-center">
+        <div className="md:hidden flex gap-2">
+          <Button 
+            variant={viewMode === 'table' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setViewMode('table')}
+          >
+            <Table className="h-4 w-4 mr-1" />
+            Table
+          </Button>
+          <Button 
+            variant={viewMode === 'list' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setViewMode('list')}
+          >
+            <List className="h-4 w-4 mr-1" />
+            List
+          </Button>
+        </div>
       </div>
       
+      {/* Header - only show in table mode or on desktop */}
+      {viewMode === 'table' && (
+        <div className={`hidden md:grid ${gridLayout} gap-4 items-center text-sm font-medium text-muted-foreground px-3`}>
+          {sessionType === 'contest' ? (
+            <>
+              <div>Problem Name</div>
+              <div className="text-center">Solved</div>
+              <div className="text-center">Upsolved</div>
+              <div>Tag</div>
+              <div>Review</div>
+              <div>Notes</div>
+              <div></div>
+            </>
+          ) : (
+            <>
+              <div>Problem Name</div>
+              <div className="text-center">Solved</div>
+              <div>Tag</div>
+              <div>Review</div>
+              <div>Notes</div>
+              <div></div>
+            </>
+          )}
+        </div>
+      )}
+      
       {/* Problem Rows */}
-      {problems.map((problem) => (
-        <ProblemRow
-          key={problem.id}
-          problem={problem}
-          sessionType={sessionType}
-          onUpdateProblem={onUpdateProblem}
-          onDeleteProblem={onDeleteProblem}
-          isProblemHighlighted={isProblemHighlighted}
-          isProblemSuccessful={isProblemSuccessful}
-          getHighlightClasses={getHighlightClasses}
-          gridLayout={gridLayout}
-        />
-      ))}
+      <div className="space-y-3">
+        {problems.map((problem) => (
+          <ProblemRow
+            key={problem.id}
+            problem={problem}
+            sessionType={sessionType}
+            onUpdateProblem={onUpdateProblem}
+            onDeleteProblem={onDeleteProblem}
+            isProblemHighlighted={isProblemHighlighted}
+            isProblemSuccessful={isProblemSuccessful}
+            getHighlightClasses={getHighlightClasses}
+            gridLayout={viewMode === 'table' ? gridLayout : 'grid-cols-1'}
+            viewMode={viewMode}
+          />
+        ))}
+      </div>
       
       <Button
         variant="outline"
