@@ -48,21 +48,16 @@ A personal DSA practice tracker application with authentication and MongoDB back
    npm install
    ```
 
-2. Build the project:
-   ```bash
-   npm run build
-   ```
-
-3. Deploy to GitHub Pages:
+2. Build and deploy the project:
    ```bash
    npm run deploy
    ```
 
 ### Configuration
 
-1. Update the `base` path in `vite.config.ts` to match your GitHub repository name:
-   ```javascript
-   base: "/your-repo-name/",
+1. Make sure your GitHub repository name matches the base path in the `.env.production` file:
+   ```env
+   VITE_BASE_PATH=/your-repo-name/
    ```
 
 2. Make sure your GitHub repository settings have GitHub Pages enabled with the `gh-pages` branch.
@@ -89,6 +84,10 @@ npm run dev
 - `USERNAME`: Admin username for login
 - `PASSWORD`: Admin password for login
 
+### Frontend
+- `.env.development`: Base path for development (`VITE_BASE_PATH=/`)
+- `.env.production`: Base path for production (`VITE_BASE_PATH=/your-repo-name/`)
+
 ## API Endpoints
 
 - `POST /api/auth/login` - User authentication
@@ -99,3 +98,18 @@ npm run dev
 - `PUT /api/sessions/:sessionId/problems/:problemId` - Update a problem
 - `POST /api/sessions/:sessionId/problems` - Add a problem to a session
 - `DELETE /api/sessions/:sessionId/problems/:problemId` - Delete a problem from a session
+
+## Troubleshooting
+
+### GitHub Pages Shows Blank Page
+
+1. Make sure you're using `HashRouter` instead of `BrowserRouter` in your React app
+2. Verify that the `VITE_BASE_PATH` in `.env.production` matches your GitHub repository name
+3. Check that GitHub Pages is enabled in your repository settings
+4. Make sure the `gh-pages` branch has been created and contains the built files
+
+### Login Issues
+
+1. Verify that the backend server is running
+2. Check that the MongoDB connection string is correct
+3. Verify that the username and password in the server's `.env` file are correct

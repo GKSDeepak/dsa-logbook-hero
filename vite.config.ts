@@ -8,9 +8,6 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const base = env.VITE_BASE_PATH || '/';
   
-  console.log(`Building for mode: ${mode}`);
-  console.log(`Base path: ${base}`);
-  
   return {
     base,
     server: {
