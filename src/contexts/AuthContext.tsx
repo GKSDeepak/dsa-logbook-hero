@@ -19,7 +19,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (username: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
-      const response = await fetch("http://localhost:3001/api/auth/login", {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error("Login error:", error);
-      return { success: false, message: "Network error. Please try again." };
+      return { success: false, message: "Network error. Please check your connection and try again." };
     }
   };
 

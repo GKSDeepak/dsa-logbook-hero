@@ -60,7 +60,12 @@ A personal DSA practice tracker application with authentication and MongoDB back
    VITE_BASE_PATH=/your-repo-name/
    ```
 
-2. Make sure your GitHub repository settings have GitHub Pages enabled with the `gh-pages` branch.
+2. For the deployed version to work, you need to:
+   - Deploy your backend to a cloud service (like Render, Heroku, or Vercel)
+   - Update `VITE_API_BASE_URL` in `.env.production` with your backend URL
+   - Example: `VITE_API_BASE_URL=https://your-backend-url.com`
+
+3. Make sure your GitHub repository settings have GitHub Pages enabled with the `gh-pages` branch.
 
 ## Development
 
@@ -85,8 +90,8 @@ npm run dev
 - `PASSWORD`: Admin password for login
 
 ### Frontend
-- `.env.development`: Base path for development (`VITE_BASE_PATH=/`)
-- `.env.production`: Base path for production (`VITE_BASE_PATH=/your-repo-name/`)
+- `.env.development`: Base path for development (`VITE_BASE_PATH=/`) and API URL (`VITE_API_BASE_URL=http://localhost:3001`)
+- `.env.production`: Base path for production (`VITE_BASE_PATH=/your-repo-name/`) and API URL (`VITE_API_BASE_URL=https://your-backend-url.com`)
 
 ## API Endpoints
 
@@ -110,6 +115,8 @@ npm run dev
 
 ### Login Issues
 
-1. Verify that the backend server is running
+1. Verify that the backend server is running and accessible from the internet (not just localhost)
 2. Check that the MongoDB connection string is correct
 3. Verify that the username and password in the server's `.env` file are correct
+4. Ensure `VITE_API_BASE_URL` in `.env.production` points to your deployed backend URL
+5. Check browser console for CORS errors, which may require updating the backend CORS configuration

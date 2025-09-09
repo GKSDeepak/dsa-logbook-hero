@@ -6,7 +6,35 @@ const { connectToDatabase } = require('./database');
 const app = express();
 const PORT = 3001;
 
-app.use(cors());
+// Configure CORS to allow requests from GitHub Pages
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost for development
+    if (origin.startsWith('http://localhost') || origin.startsWith('https://localhost')) {
+      return callback(null, true);
+    }
+    
+    // Allow GitHub Pages domains (update with your actual domain)
+    if (origin.endsWith('.github.io')) {
+      return callback(null, true);
+    }
+    
+    // Allow specific domain if set in environment variable
+    const allowedOrigin = process.env.ALLOWED_ORIGIN;
+    if (allowedOrigin && origin === allowedOrigin) {
+      return callback(null, true);
+    }
+    
+    // Block other origins
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Initialize MongoDB connection and data access
